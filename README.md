@@ -1,10 +1,18 @@
 # lrc2osb
-Script to convert LRC lyrics to osu! storyboard
-Usage: `py .\lrc2osb.py "/path/to/lyrics.lrc" "/path/to/storyboard.osb"`
+Script to convert LRC lyrics to osu! storyboard. Uses a slightly modified version of [frankhjwx](https://github.com/frankhjwx/)'s [LyricsParser](https://github.com/frankhjwx/osu-storyboard-engine/blob/master/Storyboard%20Engine/tools/LyricsParser.py).
+
+## Set-up
+You will need to have installed Python 3.\*. For example: Python 3.10.
+
+Install the depencies using `py -m pip install -r requirements.txt`.
+
+## Usage
+
+`py .\lrc2osb.py "/path/to/lyrics.lrc" "/path/to/storyboard.osb"`
 Where the path to storyboard does not yet exist.
 
 ## LRC format
-This script expects LRC with only \[MM:SS.ms\] timestamps. Every timed line should start with one, and may contain multiple timestamps for karaoke-sync and line-end time.
+This script expects LRC with \[MM:SS.ms\] timestamps. Every timed line should start with one, and may contain multiple timestamps for karaoke-sync and line-end time.
 
 Example:
 ```
