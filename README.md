@@ -1,6 +1,14 @@
 # lrc2osb
 Script to convert LRC lyrics to osu! storyboard
-Usage: `py .\lrc2osb.py "/path/to/lyrics.lrc" "/path/to/storyboard.osb"`
+
+## Set-up
+You will need to have installed Python 3.\*. For example: Python 3.10.
+
+Install the depencies using `py -m pip install -r requirements.txt`.
+
+## Usage
+
+`py .\lrc2osb.py "/path/to/lyrics.lrc" "/path/to/storyboard.osb"`
 Where the path to storyboard does not yet exist.
 
 ## LRC format
