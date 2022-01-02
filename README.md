@@ -12,7 +12,7 @@ Install the depencies using `py -m pip install -r requirements.txt`.
 Where the path to storyboard does not yet exist.
 
 ## LRC format
-This script expects LRC with only \[MM:SS.ms\] timestamps. Every timed line should start with one, and may contain multiple timestamps for karaoke-sync and line-end time.
+This script expects LRC with \[MM:SS.ms\] timestamps. Every timed line should start with one, and may contain multiple timestamps for karaoke-sync and line-end time.
 
 Example:
 ```
