@@ -6,7 +6,8 @@ from parser.lrc_parser import CharacterRenderer, LyricParser
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("lrc_path", type=str, help="Path to LRC file")
-    parser.add_argument("beatmap_path", type=str, nargs="?", help="Path to beatmap")
+    parser.add_argument("storyboard_path", type=str, nargs="?", help="Name and path of the storyboard (ending on .osb)",
+                        default="storyboard.osb")
     return parser.parse_args()
 
 
@@ -17,7 +18,7 @@ if __name__ == '__main__':
     # LP.parse_test()
     CR.render()
 
-    with open("test.osb", "w", encoding="utf-8") as f:
+    with open(args.beatmap_path, "w", encoding="utf-8") as f:
         f.write("[Events]\n"
                 "//Background and Video events\n"
                 "//Storyboard Layer 0 (Background)\n"
