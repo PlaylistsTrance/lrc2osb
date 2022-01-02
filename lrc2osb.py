@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # LP.parse_test()
     CR.render()
 
-    with open(args.beatmap_path, "w", encoding="utf-8") as f:
+    with open(args.storyboard_path, "w", encoding="utf-8") as f:
         f.write("[Events]\n"
                 "//Background and Video events\n"
                 "//Storyboard Layer 0 (Background)\n"
@@ -27,16 +27,17 @@ if __name__ == '__main__':
                 "//Storyboard Layer 3 (Foreground)\n")
         for sentence in LP.sentences:
             for letter in sentence.letters:
-                if letter.start_t > sentence.start_t:
+                if letter.character != " " and letter.start_t > sentence.start_t:
                     f.write(f"Sprite,Foreground,BottomLeft,{letter.filename_dark},"
                             f"{320 - sentence.width/2 + letter.offset_x:.4f},400\n")
                     f.write(f" F,0,{int(sentence.start_t*1000)-1},{int(sentence.start_t*1000)},0,1\n")
                     f.write(f" F,0,{int(letter.start_t*1000)-1},{int(letter.start_t*1000)},1,0\n")
             for letter in sentence.letters:
-                f.write(f"Sprite,Foreground,BottomLeft,{letter.filename_light},"
-                        f"{320 - sentence.width/2 + letter.offset_x:.4f},400\n")
-                f.write(f" F,19,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},1\n")
-                f.write(f" F,0,{int(sentence.end_t*1000)-1},{int(sentence.end_t*1000)},1,0\n")
+                if letter.character != " ":
+                    f.write(f"Sprite,Foreground,BottomLeft,{letter.filename_light},"
+                            f"{320 - sentence.width/2 + letter.offset_x:.4f},400\n")
+                    f.write(f" F,19,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},1\n")
+                    f.write(f" F,0,{int(sentence.end_t*1000)-1},{int(sentence.end_t*1000)},1,0\n")
         f.write(
                 "//Storyboard Layer 4 (Overlay)\n"
                 "//Storyboard Sound Samples\n")

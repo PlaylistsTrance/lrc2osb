@@ -37,8 +37,8 @@ class CharacterRenderer:
         self.color_dark = color_dark
         self.color_light = color_light
         pygame.init()
-        self.font = pygame.font.SysFont(font, self.font_size)
-        self.korean_font = pygame.font.SysFont(korean_font, self.font_size)
+        self.font = pygame.font.SysFont(font, self.font_size, bold=True)
+        self.korean_font = pygame.font.SysFont(korean_font, self.font_size, bold=True)
         self.padding = 0
 
     def set_ch(self, letter):
