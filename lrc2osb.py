@@ -29,11 +29,15 @@ if __name__ == '__main__':
                 "//Storyboard Layer 1 (Fail)\n"
                 "//Storyboard Layer 2 (Pass)\n"
                 "//Storyboard Layer 3 (Foreground)\n")
-        for sentence in LP.sentences:
+        for i, sentence in enumerate(LP.sentences):
+            if i > 0 and sentence.start_t < LP.sentences[i-1].end_t:
+                offset_y = LP.sentences[i-1].height + sentence.height/2
+            else:
+                offset_y = 0
             for letter in sentence.letters:
                 if letter.character != " " and letter.start_t > sentence.start_t:
                     f.write(f"Sprite,Foreground,CentreLeft,{letter.filename_dark},"
-                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y:.4f}\n")
+                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y - offset_y:.4f}\n")
                     f.write(f" F,0,{int((sentence.start_t+args.offset)*1000)-1},"
                             f"{int((sentence.start_t+args.offset)*1000)},0,1\n")
                     f.write(f" F,0,{int((letter.start_t+args.offset)*1000)-1},"
@@ -41,8 +45,8 @@ if __name__ == '__main__':
             for letter in sentence.letters:
                 if letter.character != " ":
                     f.write(f"Sprite,Foreground,CentreLeft,{letter.filename_light},"
-                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y:.4f}\n")
-                    f.write(f" F,0,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},1\n")
+                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y - offset_y:.4f}\n")
+                    f.write(f" F,19,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},0,1\n")
                     f.write(f" F,0,{int(sentence.end_t*1000)-1},{int(sentence.end_t*1000)},1,0\n")
         f.write(
                 "//Storyboard Layer 4 (Overlay)\n"
