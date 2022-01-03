@@ -8,7 +8,20 @@ Install the depencies using `py -m pip install -r requirements.txt`.
 
 ## Usage
 
-`py .\lrc2osb.py "/path/to/lyrics.lrc" "/path/to/storyboard.osb"`
+```
+usage: lrc2osb.py [-h] [-p [STORYBOARD_PATH]] [-o [OFFSET]] [-y Y] lrc_path
+
+positional arguments:
+  lrc_path              path to LRC file
+
+options:
+  -h, --help            show this help message and exit
+  -p [STORYBOARD_PATH], --storyboard_path [STORYBOARD_PATH]
+                        name and path of the storyboard (ending with .osb)
+  -o [OFFSET], --offset [OFFSET]
+                        offset in seconds (decimal) to line up the LRC with the beatmap audio
+  -y Y                  y-coordinate for placing the lyrics (0 is highest, 480 is lowest) (default: 400.0)
+```
 Where the path to storyboard does not yet exist.
 
 ## LRC format
