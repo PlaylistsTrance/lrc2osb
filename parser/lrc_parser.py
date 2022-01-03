@@ -69,6 +69,8 @@ class CharacterRenderer:
 
     def ch_render(self, index):
         character = self.characters[index]
+        if character == " ":
+            return
         if self.re_korean.match(character):
             dark = self.korean_font.render(character, True, self.color_dark)
             light = self.korean_font.render(character, True, self.color_light)
