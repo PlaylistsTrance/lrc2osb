@@ -5,9 +5,13 @@ from parser.lrc_parser import CharacterRenderer, LyricParser
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("lrc_path", type=str, help="Path to LRC file")
-    parser.add_argument("storyboard_path", type=str, nargs="?", help="Name and path of the storyboard (ending on .osb)",
-                        default="storyboard.osb")
+    parser.add_argument("lrc_path", type=str, help="path to LRC file")
+    parser.add_argument("-p", "--storyboard_path", type=str, nargs="?",
+                        help="name and path of the storyboard (ending with .osb)", default="storyboard.osb")
+    parser.add_argument("-o", "--offset", type=float, nargs="?", default=0.0,
+                        help="offset in seconds (decimal) to line up the LRC with the beatmap audio")
+    parser.add_argument("-y", type=float, default=400.0,
+                        help="y-coordinate for placing the lyrics (0 is highest, 480 is lowest) (default: 400.0)")
     return parser.parse_args()
 
 
@@ -28,15 +32,17 @@ if __name__ == '__main__':
         for sentence in LP.sentences:
             for letter in sentence.letters:
                 if letter.character != " " and letter.start_t > sentence.start_t:
-                    f.write(f"Sprite,Foreground,BottomLeft,{letter.filename_dark},"
-                            f"{320 - sentence.width/2 + letter.offset_x:.4f},400\n")
-                    f.write(f" F,0,{int(sentence.start_t*1000)-1},{int(sentence.start_t*1000)},0,1\n")
-                    f.write(f" F,0,{int(letter.start_t*1000)-1},{int(letter.start_t*1000)},1,0\n")
+                    f.write(f"Sprite,Foreground,CentreLeft,{letter.filename_dark},"
+                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y:.4f}\n")
+                    f.write(f" F,0,{int((sentence.start_t+args.offset)*1000)-1},"
+                            f"{int((sentence.start_t+args.offset)*1000)},0,1\n")
+                    f.write(f" F,0,{int((letter.start_t+args.offset)*1000)-1},"
+                            f"{int((letter.start_t+args.offset)*1000)},1,0\n")
             for letter in sentence.letters:
                 if letter.character != " ":
-                    f.write(f"Sprite,Foreground,BottomLeft,{letter.filename_light},"
-                            f"{320 - sentence.width/2 + letter.offset_x:.4f},400\n")
-                    f.write(f" F,19,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},1\n")
+                    f.write(f"Sprite,Foreground,CentreLeft,{letter.filename_light},"
+                            f"{320 - sentence.width/2 + letter.offset_x:.4f},{args.y:.4f}\n")
+                    f.write(f" F,0,{int(letter.start_t*1000)},{int(letter.end_t*1000)-1},1\n")
                     f.write(f" F,0,{int(sentence.end_t*1000)-1},{int(sentence.end_t*1000)},1,0\n")
         f.write(
                 "//Storyboard Layer 4 (Overlay)\n"
