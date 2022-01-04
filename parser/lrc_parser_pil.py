@@ -42,6 +42,7 @@ class CharacterRenderer:
         self.file_path = file_path
         self.rel_path = rel_path
         self.font = ImageFont.truetype(font=font, size=35)
+        self.font_aa = ImageFont.truetype(font=font, size=70)
         self.padding = 0
         self.stroke_width = 5
 
@@ -68,13 +69,17 @@ class CharacterRenderer:
         if not os.path.exists(image_path):
             if not os.path.exists(render_path):
                 os.makedirs(render_path)
-            im = Image.new('RGBA', (letter.width, letter.height), (255, 255, 255, 0))
+
+            width, height = self.font_aa.getsize(letter.character, stroke_width=self.stroke_width)
+            im = Image.new('RGBA', (width, height), (255, 255, 255, 0))
             drawer = ImageDraw.Draw(im)
-            offset = letter.offset_x
             fill_color = self.get_fill_color(letter.color, pre_sync=pre_sync)
-            drawer.text((-offset + self.stroke_width, 0), letter.character, font=self.font, fill=fill_color,
+            offset = self.font_aa.getoffset(letter.character)[0]
+
+            drawer.text((-offset + self.stroke_width, 0), letter.character, font=self.font_aa, fill=fill_color,
                         stroke_width=self.stroke_width, stroke_fill=tuple(letter.color))
-            im.save(image_path)
+            im_resized = im.resize((letter.width, letter.height), resample=Image.ANTIALIAS)
+            im_resized.save(image_path)
 
         return f"{self.rel_path}\\{file_name}"
 
