@@ -88,13 +88,12 @@ def write_osb2(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, 
             s_start_t = int((sentence.start_t + offset)*1000)
             s_end_t = int((sentence.end_t + offset)*1000)
 
-            if sentence.letters[-1].start_t != sentence.start_t:
-                if i == 0:
-                    fade_in_duration = int(min(fade_time, s_start_t))
-                else:
-                    s_diff = (lyric_parser.sentences[i-1].end_t - sentence.start_t)/2*1000
-                    fade_in_duration = int(min(fade_time, s_diff))
+            if i == 0:
+                fade_in_duration = int(min(fade_time, s_start_t))
+            else:
+                fade_in_duration = int((sentence.start_t - lyric_parser.sentences[i-1].end_t)/2*1000)
 
+            if sentence.letters[-1].start_t != sentence.start_t:
                 # Pre-sync
                 for letter in sentence.letters:
                     if letter.character == " ":
@@ -103,6 +102,8 @@ def write_osb2(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, 
                     f.write(f"Sprite,Foreground,TopLeft,"
                             f"\"{character_renderer.get_image(letter, pre_sync=True)}\","
                             f"{x:.4f},{y - offset_y:.4f}\n")
+
+                    # Fade in
                     if fade_in_duration:
                         f.write(f" F,0,{s_start_t-fade_in_duration},{s_start_t},0,1\n")
                     else:
@@ -126,13 +127,19 @@ def write_osb2(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, 
                             f"{x:.4f},{y - offset_y:.4f}\n")
 
                     # Fade in
-                    f.write(f" F,0,{l_start_t},{l_end_t},0,1\n")
+                    f.write(f" F,0,{l_start_t},{l_end_t},0.3,1\n")
                     if scale != 1:
                         f.write(f" S,0,{l_start_t},,{scale:.4f}\n")
 
                     # Fade out
                     if i < (len(lyric_parser.sentences)-1):
-                        s_diff = (lyric_parser.sentences[i+1].start_t-sentence.end_t)/2*1000
+                        if sentence.end_t > lyric_parser.sentences[i+1].start_t:
+                            if i < (len(lyric_parser.sentences)-2):
+                                s_diff = (lyric_parser.sentences[i+2].start_t-sentence.end_t)/2*1000
+                            else:
+                                s_diff = fade_time
+                        else:
+                            s_diff = (lyric_parser.sentences[i+1].start_t-sentence.end_t)/2*1000
                         fade_out_duration = int(min(fade_time, s_diff))
                     else:
                         fade_out_duration = fade_time
@@ -140,6 +147,40 @@ def write_osb2(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, 
                         f.write(f" F,0,{s_end_t},{s_end_t+fade_out_duration},1,0\n")
                     else:
                         f.write(f" F,0,{s_end_t},,1,0\n")
+
+            else:
+                for letter in sentence.letters:
+                    if letter.character == " ":
+                        continue
+                    x = 320 - sentence.width/2*scale + (letter.offset_sentence+letter.offset_x)*scale
+                    f.write(f"Sprite,Foreground,TopLeft,"
+                            f"\"{character_renderer.get_image(letter)}\","
+                            f"{x:.4f},{y - offset_y:.4f}\n")
+                    # Fade in
+                    if fade_in_duration:
+                        f.write(f" F,0,{s_start_t-fade_in_duration},{s_start_t},0,1\n")
+                    else:
+                        f.write(f" F,0,{s_start_t},,1\n")
+                    if scale != 1:
+                        f.write(f" S,0,{s_start_t},,{scale:.4f}\n")
+
+                    # Fade out
+                    if i < (len(lyric_parser.sentences)-1):
+                        if sentence.end_t > lyric_parser.sentences[i+1].start_t:
+                            if i < (len(lyric_parser.sentences)-2):
+                                s_diff = (lyric_parser.sentences[i+2].start_t-sentence.end_t)/2*1000
+                            else:
+                                s_diff = fade_time
+                        else:
+                            s_diff = (lyric_parser.sentences[i+1].start_t-sentence.end_t)/2*1000
+                        fade_out_duration = int(min(fade_time, s_diff))
+                    else:
+                        fade_out_duration = fade_time
+                    if fade_out_duration:
+                        f.write(f" F,0,{s_end_t},{s_end_t+fade_out_duration},1,0\n")
+                    else:
+                        f.write(f" F,0,{s_end_t},,1,0\n")
+
         f.write("//Storyboard Layer 4 (Overlay)\n"
                 "//Storyboard Sound Samples\n")
 

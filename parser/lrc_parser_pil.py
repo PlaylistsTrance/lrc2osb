@@ -5,6 +5,7 @@ import re
 import typing
 
 from PIL import Image, ImageFont, ImageDraw
+from send2trash import send2trash
 
 from util.util import rgb2hex
 
@@ -41,6 +42,9 @@ class CharacterRenderer:
         self.font_size = font_size
         self.file_path = file_path
         self.rel_path = rel_path
+        if os.path.exists(os.path.join(self.file_path, self.rel_path)):
+            send2trash(os.path.join(self.file_path, self.rel_path))
+
         self.font = ImageFont.truetype(font=font, size=35)
         self.font_aa = ImageFont.truetype(font=font, size=70)
         self.padding = 0
