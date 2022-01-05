@@ -75,6 +75,13 @@ def write_osb(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, s
                             fade_in_duration = int(fade_t)
                         break
 
+            fade_out_duration = int(fade_t_max)
+            for j in range(i+1, len(lyric_parser.sentences)):
+                if sentence.n_stacked == lyric_parser.sentences[j].n_stacked:
+                    fade_out_duration = int(min(fade_t_max,
+                                                (lyric_parser.sentences[j].start_t-sentence.end_t)/2*1000))
+                    break
+
             # Karaoke (syllables are timed)
             if sentence.letters[-1].start_t != sentence.start_t:
                 # Pre-sync
@@ -115,13 +122,6 @@ def write_osb(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, s
                         f.write(f" S,0,{l_start_t},,{scale:.4f}\n")
 
                     # Fade out
-                    s_diff = fade_t_max
-                    for j in range(i+1, len(lyric_parser.sentences)):
-                        if sentence.n_stacked == lyric_parser.sentences[j].n_stacked:
-                            if not sentence.n_stacked:
-                                s_diff = min(s_diff, (lyric_parser.sentences[j].start_t-sentence.end_t)/2*1000)
-                            break
-                    fade_out_duration = int(s_diff)
                     if fade_out_duration:
                         f.write(f" F,0,{s_end_t},{s_end_t+fade_out_duration},1,0\n")
                     else:
