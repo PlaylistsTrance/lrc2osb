@@ -8,10 +8,10 @@ from parser.lrc_parser import CharacterRenderer, LyricParser
 
 # defaults
 FADE_TIME = 400
-FONT_SIZE = 35
+FONT_SIZE = 50
 SCALE = 0.5
 STROKE_WIDTH = 5
-Y_POS = 0.9
+Y_POS = 0.8
 
 
 def get_args():
@@ -27,7 +27,7 @@ def get_args():
     parser.add_argument("-s", "--scale", type=float, default=SCALE, help=f"lyrics scale (default: {SCALE:.2f}")
     parser.add_argument("-fs", "--font-size", type=int, default=FONT_SIZE, help=f"font size (default: {FONT_SIZE})")
     parser.add_argument("-sw", "--stroke-width", type=int, default=STROKE_WIDTH,
-                        help=f"Stroke width (outline width) (default: {STROKE_WIDTH})")
+                        help=f"stroke width (outline width) (default: {STROKE_WIDTH})")
     return parser.parse_args()
 
 
@@ -144,17 +144,6 @@ def write_osb(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, s
                         f.write(f" S,0,{s_start_t},,{scale:.4f}\n")
 
                     # Fade out
-                    if i < (len(lyric_parser.sentences)-1):
-                        if sentence.end_t > lyric_parser.sentences[i+1].start_t:
-                            if i < (len(lyric_parser.sentences)-2):
-                                s_diff = (lyric_parser.sentences[i+2].start_t-sentence.end_t)/2*1000
-                            else:
-                                s_diff = fade_t_max
-                        else:
-                            s_diff = (lyric_parser.sentences[i+1].start_t-sentence.end_t)/2*1000
-                        fade_out_duration = int(min(fade_t_max, s_diff))
-                    else:
-                        fade_out_duration = fade_t_max
                     if fade_out_duration:
                         f.write(f" F,0,{s_end_t},{s_end_t+fade_out_duration},1,0\n")
                     else:

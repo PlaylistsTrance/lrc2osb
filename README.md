@@ -1,43 +1,54 @@
 # lrc2osb
-Script to convert LRC lyrics to osu! storyboard. Uses a slightly modified version of [frankhjwx](https://github.com/frankhjwx/)'s [LyricsParser](https://github.com/frankhjwx/osu-storyboard-engine/blob/master/Storyboard%20Engine/tools/LyricsParser.py).
+Script to convert LRC lyrics to osu! storyboard.
+Uses a modified version of [frankhjwx's](https://github.com/frankhjwx/)
+[LyricsParser](https://github.com/frankhjwx/osu-storyboard-engine/blob/master/Storyboard%20Engine/tools/LyricsParser.py).
 
 ## Set-up
 You will need to have installed Python 3.\*. For example: Python 3.10.
 
-Install the depencies using `py -m pip install -r requirements.txt`.
+Install the dependencies using `py -m pip install -r requirements.txt`.
 
 ## Usage
 
 ```
-usage: lrc2osb.py [-h] [-p [STORYBOARD_PATH]] [-o [OFFSET]] [-y Y] lrc_path
+usage: lrc2osb.py [-h] [-o OFFSET] [-y] [-Y Y] [-s SCALE] [-fs FONT_SIZE] [-sw STROKE_WIDTH] lrc_path storyboard_path
 
 positional arguments:
   lrc_path              path to LRC file
+  storyboard_path       name and path of the storyboard to be made (ending with .osb)
 
 options:
   -h, --help            show this help message and exit
-  -p [STORYBOARD_PATH], --storyboard_path [STORYBOARD_PATH]
-                        name and path of the storyboard (ending with .osb)
-  -o [OFFSET], --offset [OFFSET]
+  -o OFFSET, --offset OFFSET
                         offset in seconds (decimal) to line up the LRC with the beatmap audio
-  -y Y                  y-coordinate for placing the lyrics (0 is highest, 480 is lowest) (default: 400.0)
+  -y                    overwrite existing storyboard and lyrics
+  -Y Y                  y-coordinate for placing the lyrics (0.0 is top, 1.0 is bottom) (default: 0.80)
+  -s SCALE, --scale SCALE
+                        lyrics scale (default: 0.50
+  -fs FONT_SIZE, --font-size FONT_SIZE
+                        font size (default: 50)
+  -sw STROKE_WIDTH, --stroke-width STROKE_WIDTH
+                        stroke width (outline width) (default: 5)
 ```
-Where the path to storyboard does not yet exist.
 
 ## LRC format
-This script expects LRC with \[MM:SS.ms\] timestamps. Every timed line should start with one, and may contain multiple timestamps for karaoke-sync and line-end time.
+This script expects LRC with \[MM:SS.ms\] timestamps and optional (Member(/Member2/Member3...)) member-coding.
+Every timed line should start with a timestamp, and may contain multiple timestamps for karaoke-sync and line-end time.
+Colors for member-coding are defined in [color_coding.json](https://github.com/PlaylistsTrance/lrc2osb/blob/main/color_coding.json).  
+To use color-coding, include the group name at the start of the LRC file in `[ar: Group Name]`.  
+If people sing who aren't part of the group in `[ar: Group Name]`,
+you will have to define your own group in [color_coding.json](https://github.com/PlaylistsTrance/lrc2osb/blob/main/color_coding.json)
+and use this group name in `[ar: Group Name]` instead.
 
 Example:
 ```
-[ar: PURPLE KISS]
-[ti: Cast pearls before swine]
-[al: HIDE & SEEK]
+[ar: Red Velvet]
+[ti: FUTURE]
+[al: Start-Up OST Part.1]
 [by: RevolutionVoid]
-[re: RhythmiKaRuTTE]
-[length: 03:08]
-[00:06.31]뭐[00:06.48]라[00:06.68]는 [00:06.96]거[00:07.09]니[00:07.37] [00:07.91]솔[00:08.11]직[00:08.36]해 [00:08.57]봐 [00:08.97]봐
-[00:09.51]뭐 [00:09.73]하[00:09.93]는 [00:10.15]거[00:10.29]니[00:10.53] [00:11.05]내 [00:11.33]눈 [00:11.51]쳐[00:11.74]다[00:12.15]봐
-[00:12.73]나 [00:12.93]혼[00:13.12]자 [00:13.34]벌[00:14.35]받[00:14.52]는 [00:14.74]거 [00:14.99]같[00:15.30]아
-[00:16.39]사[00:16.67]랑[00:16.95]이[00:17.14]란 [00:17.36]불[00:17.52]에 [00:17.75]데[00:17.90]었[00:18.11]잖[00:18.53]아
-[00:19.31]새[00:20.13]빨[00:20.26]간 [00:20.89]거[00:21.02]짓[00:21.70]말[00:21.96]은 [00:22.11]그[00:22.51]만
-[00:23.33]그[00:23.46]럴 [00:24.12]시[00:24.25]간[00:24.75]에 [00:24.92]잠[00:25.11]이[00:25.37]나 [00:25.75]자[00:26.12]```
+[length: 3:39]
+[re: RhythmiKaRuTTE_Spectro]
+[ve: 2021-10-24]
+[00:10.58](Wendy) 어[00:10.90]딘[00:11.13]지 [00:11.43]모[00:12.03]를[00:12.73] [00:12.98]꿈[00:13.29]결 [00:13.44]속[00:13.89]에[00:14.23]서[00:15.14]
+[00:15.64](Wendy) 행[00:16.00]복[00:16.26]한 [00:16.35]날[00:16.79] [00:17.17]또[00:17.44] [00:17.78]본 [00:18.10]것 [00:18.28]같[00:18.40]았[00:18.65]어[00:19.09]
+```
