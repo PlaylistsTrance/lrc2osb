@@ -11,8 +11,6 @@ import typing
 from PIL import Image, ImageFont, ImageDraw
 from send2trash import send2trash
 
-from util.util import rgb2hex
-
 
 class Letter:
     __slots__ = ["character", "id", "start_t", "end_t", "offset_sentence", "offset_x", "offset_y", "width", "height",
@@ -30,8 +28,8 @@ class Letter:
         self.height = height
         self.color = color
 
-    def get_file_name(self, pre_sync=False):
-        return f"{ord(self.character):04x}_{rgb2hex(*self.color)}_{'pre' if pre_sync else 'post'}.png"
+    def get_file_name(self, outline=False):
+        return f"{ord(self.character):04x}{'_ol'*int(outline)}.png"
 
 
 # TODO: Language support other than Korean
@@ -40,6 +38,7 @@ class CharacterRenderer:
                  skip_warning=False):
         self.file_path = file_path
         self.rel_path = rel_path
+        self.render_path = os.path.join(self.file_path, self.rel_path)
         if os.path.exists(os.path.join(self.file_path, self.rel_path)):
             if not skip_warning:
                 if input("Delete existing lyrics images and continue? (y/N)\n").lower() != "y":
@@ -71,30 +70,31 @@ class CharacterRenderer:
         else:
             return int(r+0.7*(255-r)), int(g+0.7*(255-g)), int(b+0.7*(255-b))
 
-    def get_image(self, letter: Letter, pre_sync=False) -> str:
-        """Render and save character to PNG file if it doesn't exist yet and return its path."""
-        render_path = os.path.join(self.file_path, self.rel_path)
-        file_name = letter.get_file_name(pre_sync=pre_sync)
-        image_path = os.path.join(render_path, file_name)
+    def render(self, letter: Letter, outline=False):
+        """Render and save character outline to PNG file if it doesn't exist yet and return its path."""
+        file_name = letter.get_file_name(outline=outline)
+        image_path = os.path.join(self.render_path, file_name)
         if not os.path.exists(image_path):
-            if not os.path.exists(render_path):
-                os.makedirs(render_path)
-
+            if not os.path.exists(self.render_path):
+                os.makedirs(self.render_path)
             width, height = self.font_aa.getsize(letter.character, stroke_width=self.stroke_width)
             im = Image.new('RGBA', (width, height), (255, 255, 255, 0))
             drawer = ImageDraw.Draw(im)
-            fill_color = self.get_fill_color(letter.color, pre_sync=pre_sync)
             offset = self.font_aa.getoffset(letter.character)[0]
 
-            drawer.text((-offset + self.stroke_width, 0), letter.character, font=self.font_aa, fill=fill_color,
-                        stroke_width=self.stroke_width, stroke_fill=tuple(letter.color))
+            drawer.text((-offset + self.stroke_width, 0), letter.character, font=self.font_aa,
+                        fill=(255, 255, 255, 255),
+                        stroke_width=self.stroke_width, stroke_fill=(255, 255, 255, 255*int(outline)))
             # 2x Super-sampling
             im_resized = im.resize((letter.width, letter.height), resample=Image.ANTIALIAS)
 
             # Save to file
             im_resized.save(image_path)
-
         return f"{self.rel_path}\\{file_name}"
+
+    def get_sprites(self, letter: Letter) -> typing.Tuple[str, str]:
+        """Returns character fill and outline image paths."""
+        return self.render(letter), self.render(letter, outline=True)
 
 
 class Sentence:
@@ -170,7 +170,10 @@ class LyricParser:
             if not matches:
                 continue
 
-            time_start = self.match2seconds(matches[0])
+            if matches[0]['lyric'] == "​":
+                time_start = self.match2seconds(matches[1])
+            else:
+                time_start = self.match2seconds(matches[0])
             if len(matches) > 1 and matches[-1]['lyric'].strip() == "":
                 time_end = self.match2seconds(matches[-1])
             elif i < (len(lines)-1):
@@ -211,15 +214,17 @@ class LyricParser:
                                 members = match['members'].split("/")
                                 if len(members) == 1:
                                     col = self.colors['members'][members[0].lower()]
+                                    if sentence.letters and sentence.letters[-1].character == "(":
+                                        sentence.letters[-1].color = col
                                 else:
                                     col = self.colors['group']
                                 n_skip = len(match['members']) + 2
                                 continue
                             else:
                                 col = self.colors['group']
-                        elif c == ")":
-                            col = self.colors['group']
                     letter = self.CR.get_ch(c, time_start, time_end, color=col)
+                    if self.colors and c == ")":
+                        col = self.colors['group']
                     sentence.append(letter)
 
             sentences.append(sentence)
