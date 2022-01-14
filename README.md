@@ -37,10 +37,10 @@ options:
 ## LRC format
 This script expects LRC with \[MM:SS.ms\] timestamps and optional (Member(/Member2/Member3...)) member-coding.
 Every timed line should start with a timestamp, and may contain multiple timestamps for karaoke-sync and line-end time.
-Colors for member-coding are defined in [color_coding.json](https://github.com/PlaylistsTrance/lrc2osb/blob/main/color_coding.json).  
+Colors for member-coding are defined in [color_coding.json](color_coding.json).  
 To use color-coding, include the group name at the start of the LRC file in `[ar: Group Name]`.  
 If people sing who aren't part of the group in `[ar: Group Name]`,
-you will have to define your own group in [color_coding.json](https://github.com/PlaylistsTrance/lrc2osb/blob/main/color_coding.json)
+you will have to define your own group in [color_coding.json](color_coding.json)
 and use this group name in `[ar: Group Name]` instead.
 
 Example:
