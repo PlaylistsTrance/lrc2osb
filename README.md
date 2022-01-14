@@ -3,6 +3,9 @@ Script to convert LRC lyrics to osu! storyboard.
 Uses a modified version of [frankhjwx's](https://github.com/frankhjwx/)
 [LyricsParser](https://github.com/frankhjwx/osu-storyboard-engine/blob/master/Storyboard%20Engine/tools/LyricsParser.py).
 
+![Thumbnail](https://github.com/PlaylistsTrance/lrc2osb/blob/development/RedVelvetLittleLittleExample.jpg)
+(Red Velvet - Little Little @1:52. Full demo: https://youtu.be/As01KO65yAU)
+
 ## Set-up
 You will need to have installed Python 3.\*. For example: Python 3.10.
 
