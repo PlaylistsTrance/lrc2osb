@@ -110,16 +110,30 @@ def write_osb(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, s
     lyric_parser = LyricParser(lrc_path, character_renderer)
 
     commands = []
+    use_pre = False
+    for i, sentence in enumerate(lyric_parser.sentences):
+        if not use_pre and sentence.letters[-1].start_t != sentence.start_t:
+            use_pre = True
+        if i == 0:
+            continue
+        found = False
+        while not found:
+            level_match = False
+            for j in range(i-1, -1, -1):
+                if lyric_parser.sentences[j].n_stacked == sentence.n_stacked:
+                    level_match = True
+                    if lyric_parser.sentences[j].end_t > sentence.start_t:
+                        sentence.n_stacked += 1
+                        sentence.offset_y += lyric_parser.sentences[j].height*scale
+                        break
+                    else:
+                        found = True
+                        break
+            if not level_match:
+                found = True
 
     for i, sentence in enumerate(lyric_parser.sentences):
-        for j in range(i-1, -1, -1):
-            if sentence.start_t < lyric_parser.sentences[j].end_t:
-                sentence.offset_y += sentence.height*scale
-                sentence.n_stacked += 1
-            else:
-                break
-
-    for i, sentence in enumerate(lyric_parser.sentences):
+        # print(sentence.content, sentence.n_stacked)
         commands.append(f"//{sentence.content}")
 
         s_start_t = int((sentence.start_t + offset)*1000)
@@ -141,11 +155,11 @@ def write_osb(storyboard_path: str, lrc_path: str, file_path: str, offset=0.0, s
         fade_out_duration = int(fade_t_max)
         for j in range(i+1, len(lyric_parser.sentences)):
             if sentence.n_stacked == lyric_parser.sentences[j].n_stacked:
+                # print("Matched:", lyric_parser.sentences[j].content, lyric_parser.sentences[j].n_stacked)
                 fade_out_duration = int(min(fade_t_max,
                                             (lyric_parser.sentences[j].start_t-sentence.end_t)/2*1000))
                 break
 
-        use_pre = sentence.letters[-1].start_t != sentence.start_t
         # Pre-sync
         for letter in sentence.letters:
             if letter.character == " ":
